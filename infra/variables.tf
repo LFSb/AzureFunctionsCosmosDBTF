@@ -29,3 +29,11 @@ variable "cosmos_db_container_name"{
 variable "cosmos_db_partition_key_path"{
   default = "/Date"
 }
+
+variable "app_service_plan_tier"{
+  default = "Dynamic"
+}
+
+variable "app_service_plan_size"{
+  default = "Y1"
+}
