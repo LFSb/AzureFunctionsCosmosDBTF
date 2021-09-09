@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace My.Function
 {
-  public static class HttpExampleService
+  public static class Main
   {
     [FunctionName("newsitem")]
     public static async Task<IActionResult> Post(
