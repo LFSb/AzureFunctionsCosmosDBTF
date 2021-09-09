@@ -1,0 +1,55 @@
+{
+	"info": {
+		"_postman_id": "d1ba5596-9610-4739-9a9f-0b2c85ea60bf",
+		"name": "AzureFunctionsCosmosDb",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET api/news",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/news/{{Name}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"news",
+						"{{Name}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/newsitem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{Name}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/newsitem",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"newsitem"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
