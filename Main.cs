@@ -9,60 +9,75 @@ using My.Function.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace My.Function
 {
   public static class Main
   {
-    [FunctionName("newsitem")]
+    [FunctionName("PostNewsItem")]
     public static async Task<IActionResult> Post(
-      [CosmosDB(databaseName: "lfs-cosmos-20210831", collectionName: "my-container", ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<dynamic> documentsOut,
-      [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+      [CosmosDB(databaseName: "Website", collectionName: "News", ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<dynamic> documentsOut,
+      [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "newsitem")] HttpRequest req,
       ILogger log)
     {
       log.LogInformation("Request received.");
 
-      string name = req.Query["name"];
-
       string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-      dynamic data = JsonConvert.DeserializeObject(requestBody);
-      name = name ?? data?.name;
+      var data = JsonConvert.DeserializeObject<News>(requestBody);
+      
+      string responseMessage = data == null
+          ? "This HTTP triggered function executed successfully. Pass a valid json to save it to the website. Example: { \"Title\": \"This is an interesting title\", \"Description\": \"This is a less interesting description\"}"
+          : $"Your article with title '{data.Title}' was saved successfully.";
 
-      string responseMessage = string.IsNullOrEmpty(name)
-          ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-          : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-      if (!string.IsNullOrEmpty(name))
+      if (data != null)
       {
-        await documentsOut.AddAsync(new
-        {
-          id = System.Guid.NewGuid().ToString(),
-          name = name
-        });
+        data.Date = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        await documentsOut.AddAsync(data);
       }
 
       return new OkObjectResult(responseMessage);
     }
 
-    [FunctionName("news")]
-    public static async Task<IActionResult> Get(
-      [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "news/{id}")] HttpRequest req,
-      [CosmosDB(databaseName: "lfs-cosmos-20210831", 
-                collectionName: "my-container", 
+    [FunctionName("GetNewsByTitle")]
+    public static async Task<IActionResult> GetByTitle(
+      [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "news/{title}")] HttpRequest req,
+      [CosmosDB(databaseName: "Website", 
+                collectionName: "News", 
                 ConnectionStringSetting = "CosmosDbConnectionString", 
-                SqlQuery = "SELECT * FROM c WHERE c.name = {id}"                
-                )] IEnumerable<Name> nameItem,
+                SqlQuery = "SELECT * FROM c WHERE c.Title = {title}"                
+                )] IEnumerable<News> newsItems,
       ILogger log,
-      string id)
+      string title)
     {
-      log.LogInformation($"Triggered with {id}");
+      log.LogInformation($"Triggered with {title}");
 
-      if (!nameItem.Any())
+      if (!newsItems.Any())
       {
         return new NotFoundResult();
       }
 
-      return new OkObjectResult($"Congrats! You entered something that seems to exist. You called this with {id}, by the by.");
+      var firstNewsItem = newsItems.OrderBy(x => DateTime.Parse(x.Date)).First();
+
+      return new OkObjectResult($@"Congrats! You entered something that seems to exist ({newsItems.Count()} times). 
+You called this with '{title}', by the by. 
+-By date, the first result is from '{firstNewsItem.Date}'.
+-Its description is: '{firstNewsItem.Description}'");
     }
+
+    [FunctionName("GetAllNews")]
+    public static async Task<IActionResult> GetAll(
+      [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "news/")] HttpRequest req,
+      [CosmosDB(databaseName: "Website", 
+                collectionName: "News", 
+                ConnectionStringSetting = "CosmosDbConnectionString", 
+                SqlQuery = "SELECT * FROM c"
+                )] IEnumerable<News> newsItems,
+      ILogger log)
+      {
+        log.LogInformation($"Triggered HTTP Function.");
+
+        return new ObjectResult(newsItems);
+      }
   }
 }

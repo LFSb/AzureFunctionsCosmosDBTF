@@ -58,6 +58,11 @@ resource "azurerm_cosmosdb_sql_container" "coll" {
   partition_key_path = "${var.cosmos_db_partition_key_path}"
 }
 
+output "cosmosdb_connectionstrings" {
+   value = azurerm_cosmosdb_account.acc.connection_strings
+   sensitive   = true
+}
+
 
 /*resource "azurerm_app_service_plan" "appserviceplan" {
   name                = "${azurerm_resource_group.rg.name}-plan"
