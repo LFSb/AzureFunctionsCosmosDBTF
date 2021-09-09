@@ -32,7 +32,6 @@ namespace My.Function
 
       if (data != null)
       {
-        data.Date = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         await documentsOut.AddAsync(data);
       }
 
