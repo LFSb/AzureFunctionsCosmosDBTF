@@ -1,7 +1,3 @@
-variable "STORAGE_ACC_NAME" {}
-variable "STORAGE_ACC_KEY" {}
-variable "STORAGE_CONNECTION_STRING" {}
-
 # Configure the Azure provider
 terraform {
   required_providers {
@@ -81,6 +77,24 @@ resource "azurerm_app_service_plan" "sp" {
   }
 }
 
+resource "azurerm_storage_account" "sa" {
+  name                     = "${lower(azurerm_resource_group.rg.name)}"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+
+  depends_on = [azurerm_resource_group.rg]
+}
+
+resource "azurerm_storage_container" "sc" {
+  name                  = "func-deployments"
+  storage_account_name  = azurerm_storage_account.sa.name
+  container_access_type = "private"
+
+  depends_on = [azurerm_resource_group.rg]
+}
+
 resource "azurerm_function_app" "app" {
   name                = "${azurerm_resource_group.rg.name}-app"
   location            = azurerm_resource_group.rg.location
@@ -90,11 +104,11 @@ resource "azurerm_function_app" "app" {
     FUNCTIONS_WORKER_RUNTIME = "dotnet",
     WEBSITE_RUN_FROM_PACKAGE = "1",
     CosmosDbConnectionString = "${azurerm_cosmosdb_account.acc.connection_strings[0]}",
-    AzureWebJobsStorage = var.STORAGE_CONNECTION_STRING,
+    AzureWebJobsStorage = azurerm_storage_account.sa.primary_connection_string,
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.ai.instrumentation_key,
   }
-  storage_account_name       = var.STORAGE_ACC_NAME
-  storage_account_access_key = var.STORAGE_ACC_KEY
+  storage_account_name       = azurerm_storage_account.sa.name
+  storage_account_access_key = azurerm_storage_account.sa.primary_access_key
   version                    = "~3"
   https_only                 = true
 

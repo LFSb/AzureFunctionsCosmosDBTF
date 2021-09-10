@@ -11,7 +11,7 @@ variable "failover_location"{
 }
 
 variable "resource_group_environment"{
-  default = "Test"
+  default = "Dev"
 }
 
 variable "cosmos_db_account_name"{
