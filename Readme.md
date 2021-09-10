@@ -4,4 +4,5 @@ Requirements:
 If you aren't running the x64 version of Visual Studio Code, no need to pass the parameter. It will default to x86.
 https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-cosmosdb
  - dotnet add package Microsoft.Azure.WebJobs.Extensions.CosmosDB
-
+ - Terraform: https://www.terraform.io/downloads.html
+ - Azure CLI: https://docs.microsoft.com/en-us/cli/azure/
