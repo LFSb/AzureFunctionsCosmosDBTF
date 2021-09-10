@@ -95,6 +95,37 @@ resource "azurerm_storage_container" "sc" {
   depends_on = [azurerm_resource_group.rg]
 }
 
+data "archive_file" "ffa" {
+  type        = "zip"
+  source_dir  = "../release"
+  output_path = "src.zip"
+}
+
+resource "azurerm_storage_blob" "storage_blob" {
+  name = "${filesha256(data.archive_file.ffa.output_path)}.zip"
+  storage_account_name = azurerm_storage_account.sa.name
+  storage_container_name = azurerm_storage_container.sc.name
+  type = "Block"
+  source = data.archive_file.ffa.output_path
+}
+
+data "azurerm_storage_account_blob_container_sas" "sabcs" {
+  connection_string = azurerm_storage_account.sa.primary_connection_string
+  container_name    = azurerm_storage_container.sc.name
+
+  start = "2021-01-01T00:00:00Z"
+  expiry = "2022-01-01T00:00:00Z"
+
+  permissions {
+    read   = true
+    add    = false
+    create = false
+    write  = false
+    delete = false
+    list   = false
+  }
+}
+
 resource "azurerm_function_app" "app" {
   name                = "${azurerm_resource_group.rg.name}-app"
   location            = azurerm_resource_group.rg.location
@@ -102,7 +133,7 @@ resource "azurerm_function_app" "app" {
   app_service_plan_id = azurerm_app_service_plan.sp.id
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "dotnet",
-    WEBSITE_RUN_FROM_PACKAGE = "1",
+    WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.sa.name}.blob.core.windows.net/${azurerm_storage_container.sc.name}/${azurerm_storage_blob.storage_blob.name}${data.azurerm_storage_account_blob_container_sas.sabcs.sas}",
     CosmosDbConnectionString = "${azurerm_cosmosdb_account.acc.connection_strings[0]}",
     AzureWebJobsStorage = azurerm_storage_account.sa.primary_connection_string,
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.ai.instrumentation_key,
@@ -125,8 +156,3 @@ resource "azurerm_function_app" "app" {
   }
 }
 
-data "archive_file" "file_function_app" {
-  type        = "zip"
-  source_dir  = "../src"
-  output_path = "src.zip"
-}
