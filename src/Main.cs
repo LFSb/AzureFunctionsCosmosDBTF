@@ -28,7 +28,7 @@ namespace My.Function
       
       string responseMessage = data == null
           ? "This HTTP triggered function executed successfully. Pass a valid json to save it to the website. Example: { \"Title\": \"This is an interesting title\", \"Description\": \"This is a less interesting description\"}"
-          : $"Your article with title '{data.Title}' was saved successfully.";
+          : $"Your article with title '{data.Title}' was saved successfully. Request received at: {data.Date.ToString()}";
 
       if (data != null)
       {

@@ -97,7 +97,7 @@ resource "azurerm_storage_container" "sc" {
 
 data "archive_file" "ffa" {
   type        = "zip"
-  source_dir  = "../release"
+  source_dir  = "../../release"
   output_path = "src.zip"
 }
 

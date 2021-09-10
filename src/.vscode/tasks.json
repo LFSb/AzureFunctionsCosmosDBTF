@@ -29,12 +29,12 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "clean release (functions)",
+      "label": "clean publish (functions)",
       "command": "dotnet",
       "args": [
         "clean",
-        "--configuration",
-        "Release",
+        "--output",
+        "../release",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -43,16 +43,28 @@
     },
     {
       "label": "publish (functions)",
+      "dependsOn": "clean publish (functions)",
       "command": "dotnet",
       "args": [
         "publish",
         "--configuration",
         "Release",
+        "--output", 
+        "../release",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
       "type": "process",
-      "dependsOn": "clean release (functions)",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean, Publish and Deploy (functions)",
+      "dependsOn": "publish (functions)",
+      "command": "terraform",
+      "args":[
+        "-chdir=${workspaceFolder}/infra",
+        "apply"
+      ],
       "problemMatcher": "$msCompile"
     },
     {
