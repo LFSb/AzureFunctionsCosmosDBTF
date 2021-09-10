@@ -68,6 +68,15 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Destroy (functions)",
+      "command": "terraform",
+      "args":[
+        "-chdir=${workspaceFolder}/infra",
+        "destroy"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "type": "func",
       "dependsOn": "build (functions)",
       "options": {
