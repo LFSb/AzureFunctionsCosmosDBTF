@@ -156,3 +156,6 @@ resource "azurerm_function_app" "app" {
   }
 }
 
+output "api_url"{
+  value = azurerm_function_app.app.default_hostname
+}

@@ -75,6 +75,17 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "TerraTest",
+      "command": "go",
+      "args":[
+        "test",
+        "-v",
+        "-timeout",
+        "60m"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "Terraform Init",
       "command": "terraform",
       "args":[

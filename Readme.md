@@ -24,3 +24,11 @@ Terraform will then define an SAS to the files in said Storage Blob, which is th
 You can use the Postman Collection/Environment included in the repository to test out the API.
 
 After you're done, run the "Destroy (functions)" task in Visual Studio Code in order to remove all the created infrastructure and applications.
+
+Testing:
+
+If you want, you can also try to run the automated testing using TerraTest. For this you'll need to install and setup Go.
+
+Once you have everything set up, run the TerraTest task, and TerraTest will automatically Terraform init, apply, await the creation of the environment, and use the url of the created Azure Functions API and do two test calls to make sure everything is up and running before destroying the environment again. 
+
+Keep in mind that there's a 60m timeout on this test, as destroying the azurerm_cosmosdb_account.acc takes 15-25 minutes (much to my annoyance).
