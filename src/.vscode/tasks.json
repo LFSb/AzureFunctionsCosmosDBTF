@@ -29,7 +29,14 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "ensure publish folder",
+      "type": "shell",
+      "command":"New-Item -ItemType Directory -Force -Path ../publish | Out-Null",
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "clean publish (functions)",
+      "dependsOn": "ensure publish folder",
       "command": "dotnet",
       "args": [
         "clean",
@@ -64,6 +71,15 @@
       "args":[
         "-chdir=${workspaceFolder}/infra",
         "apply"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Terraform Init",
+      "command": "terraform",
+      "args":[
+        "-chdir=${workspaceFolder}/infra",
+        "init"
       ],
       "problemMatcher": "$msCompile"
     },
