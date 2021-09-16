@@ -32,5 +32,5 @@ func TestAzureFunctionsAPIReachable(t *testing.T) {
 	posturl := fmt.Sprintf("https://%s/api/newsitem", api_url)
 	body := []byte("{\"Title\": \"This is a test.\", \"Description\": \"It's for testing!\"}")
 	headers := map[string]string{}
-	http_helper.HTTPDoWithValidationRetry(t, "POST", posturl, body, headers, 200, "Your article with title 'This is a test.' was saved successfully.", 30, 5*time.Second, nil)
+	http_helper.HTTPDoWithValidationRetry(t, "POST", posturl, body, headers, 200, "Your article with title 'This is a test.' was saved successfully.", 30, 5*time.Second, nil) //Final test, POST a body to the newsitem api, the response should contain the title of the body.
 }
